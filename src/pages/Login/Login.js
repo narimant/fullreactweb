@@ -1,32 +1,82 @@
-import React from "react";
-import { Link } from 'react-router-dom'
+import React, { useContext, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../../Components/Footer/Footer";
 import Navbar from "../../Components/Navbar/Navbar";
 import Topbar from "../../Components/TopBar/TopBar";
 import Input from "../../Components/Form/Input";
 import Button from "../../Components/Form/Button";
 import "./Login.css";
-import { requiredValidator,minValidator,maxValidator,emailValidator } from "../../validators/rules";
+import {
+  requiredValidator,
+  minValidator,
+  maxValidator,
+} from "../../validators/rules";
 import { useForm } from "../../hooks/useForm";
+import AuthContext from "../../context/authContext";
+import swal from "sweetalert";
+import ReCAPTCHA from "react-google-recaptcha";
 
 export default function Login() {
 
-  const [formState,onInputHandler]=useForm({
-    username:{
-      value:'',
-      isValid:false
+  const authContext = useContext(AuthContext);
+  const navigate = useNavigate();
+  const checkContext = useContext(AuthContext);
+  const [isGoogleRecaptcha,setIsGoogleRecaptcha]=useState(false);
+
+
+  const [formState, onInputHandler] = useForm(
+    {
+      username: {
+        value: "",
+        isValid: false,
+      },
+      password: {
+        value: "",
+        isValid: false,
+      },
     },
-    password:{
-      value:'',
-      isValid:false
-    }
-  },false);
+    false
+  );
 
-
-
-  const login=(e)=>{
+  const login = (e) => {
     e.preventDefault();
-    console.log('login');
+
+    const userData = {
+      identifier: formState.inputs.username.value,
+      password: formState.inputs.password.value,
+    };
+
+    fetch(`http://127.0.0.1:4000/v1/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.text().then((text) => {
+            throw new Error(text);
+          });
+        } else {
+          return res.json();
+        }
+      })
+      .then((result) => {
+        console.log(result);
+        authContext.login({}, result.accessToken);
+        navigate("/");
+      })
+      .catch((err) => {
+        swal({
+          title: "نام کاربری یا رمز عبور اشتباه است",
+          icon: "error",
+          buttons: "تلاش دوباره",
+        });
+      });
+  };
+  const onChange=()=>{
+    setIsGoogleRecaptcha(true)
   }
   return (
     <>
@@ -52,11 +102,11 @@ export default function Login() {
                 id="username"
                 type="text"
                 placeholder="نام کاربری یا آدرس ایمیل"
-                element='input'
+                element="input"
                 validations={[
                   requiredValidator(),
                   minValidator(8),
-                  maxValidator(20)
+                  maxValidator(20),
                 ]}
                 onInputHandler={onInputHandler}
               />
@@ -68,24 +118,36 @@ export default function Login() {
                 id="password"
                 type="password"
                 placeholder="رمز عبور"
-                element='input'
+                element="input"
                 validations={[
                   requiredValidator(),
                   minValidator(8),
-                  maxValidator(18)
-
+                  maxValidator(18),
                 ]}
-              onInputHandler={onInputHandler}
+                onInputHandler={onInputHandler}
               />
               <i className="login-form__password-icon fa fa-lock-open"></i>
             </div>
-            <Button className="login-form__btn" type="submit" onClick={login} disabled={!formState.isFormValid}>
+            <div className="login-form__recaptcha">
+              <ReCAPTCHA sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI" onChange={onChange} />
+              
+            </div>
+            <Button
+              className="login-form__btn"
+              type="submit"
+              onClick={login}
+              
+              disabled={(!formState.isFormValid || !isGoogleRecaptcha) }>
               <i className="login-form__btn-icon fas fa-sign-out-alt"></i>
               <span className="login-form__btn-text">ورود</span>
             </Button>
+            
             <div className="login-form__password-setting">
               <label className="login-form__password-remember">
-                <input className="login-form__password-checkbox" type="checkbox" />
+                <input
+                  className="login-form__password-checkbox"
+                  type="checkbox"
+                />
                 <span className="login-form__password-text">
                   مرا به خاطر داشته باش
                 </span>

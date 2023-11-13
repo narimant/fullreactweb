@@ -153,3 +153,16 @@
   margin-top: 1rem;
 }
 /* ============================== Login-Register Style ============================== */
+
+
+.swal-footer{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-form__recaptcha{
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}

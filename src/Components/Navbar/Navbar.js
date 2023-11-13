@@ -1,8 +1,21 @@
-import React from "react";
+import React, { useContext } from "react";
 import {Link} from 'react-router-dom'
 import "./Navbar.css";
+import AuthContext from "../../context/authContext";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function Navbar() {
+  const user=useContext(AuthContext);
+  const [allMenus,setAllMenus]=useState([]);
+  useEffect(()=>{
+    fetch(`http://127.0.0.1:4000/v1/menus`)
+    .then((res)=>res.json())
+    .then((menus)=>{
+      setAllMenus(menus);
+    })
+  },[]);
+  
   return (
     <div className="main-header">
       <div className="container-fluid">
@@ -16,127 +29,46 @@ export default function Navbar() {
             </Link>
             <ul className="main-header__menu">
               <li className="main-header__item">
-                <a href="#" className="main-header__link">
+                <Link to='/' className="main-header__link">
                   صفحه اصلی
-                </a>
+                </Link>
               </li>
-
-              <li className="main-header__item">
-                <a href="#" className="main-header__link">
-                  فرانت اند
-                  <i className="fas fa-angle-down main-header__link-icon"></i>
-                  </a>
-                  <ul className="main-header__dropdown">
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش Html
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش Css
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش جاوا اسکریپت
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش FlexBox
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش جامع ری‌اکت
-                      </a>
-                    </li>
-                  </ul>
+              {
+                allMenus.map((menu,ind)=>(
+                  <li  key={ind} className="main-header__item">
+                  <Link to={menu.href} className="main-header__link">
+                   {menu.title}
+                   </Link>
+                   {
+                    menu.submenus.length!==0 && (
+                      
+                      <>
+                        <i className="fas fa-angle-down main-header__link-icon"></i>
+                       
+                        <ul className="main-header__dropdown">
+                          {
+                            menu.submenus.map((submenu,index)=>(
+                              
+                              <li key={index} className="main-header__dropdown-item">
+                              <Link to={submenu.href} className="main-header__dropdown-link">
+                                {submenu.title}
+                              </Link>
+                            </li>
+                            ))
+                          }
+                        
+                      
+                        </ul>
+                        </>
+                    
+                    )
+                   }
                
-              </li>
-              <li className="main-header__item">
-                <a href="#" className="main-header__link">
-                  امنیت
-                  <i className="fas fa-angle-down main-header__link-icon"></i>
-                  </a>
-                  <ul className="main-header__dropdown">
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش کالی لینوکس
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش پایتون سیاه
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش جاوا اسکریپت سیاه
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        آموزش شبکه
-                      </a>
-                    </li>
-                  </ul>
-                
-              </li>
-              <li className="main-header__item">
-                <a href="#" className="main-header__link">
-                  مقالات
-                  <i className="fas fa-angle-down main-header__link-icon"></i>
-                  </a>
-                  <ul className="main-header__dropdown">
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        توسعه وب
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        جاوا اسکریپت
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        فرانت اند
-                      </a>
-                    </li>
-                  </ul>
-               
-              </li>
-              <li className="main-header__item">
-                <a href="#" className="main-header__link">
-                  پایتون
-                  <i className="fas fa-angle-down main-header__link-icon"></i>
-                  </a>
-                  <ul className="main-header__dropdown">
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        دوره متخصص پایتون
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        دوره هوش مصنوعی با پایتون
-                      </a>
-                    </li>
-                    <li className="main-header__dropdown-item">
-                      <a href="#" className="main-header__dropdown-link">
-                        دوره متخصص جنگو
-                      </a>
-                    </li>
-                  </ul>
-               
-              </li>
-              <li className="main-header__item">
-                <a href="#" className="main-header__link">
-                  مهارت های نرم
-                </a>
-              </li>
+                </li>
+                ))
+              }
+             
+           
             </ul>
           </div>
 
@@ -147,9 +79,17 @@ export default function Navbar() {
             <a href="#" className="main-header__cart-btn">
               <i className="fas fa-shopping-cart main-header__cart-icon"></i>
             </a>
-            <a href="#" className="main-header__profile">
-              <span className="main-header__profile-text">محمدامین سعیدی راد</span>
-            </a>
+            
+             {user.isLoggedIn ? (
+                <Link to='#' className="main-header__profile">
+                    <span className="main-header__profile-text"> {user.userInfos.name }</span>
+                </Link>
+              ): (
+                <Link to='/login' className="main-header__profile">
+                <span className="main-header__profile-text"> ورود / ثبت نام</span>
+            </Link>
+              )}
+           
           </div>
         </div>
       </div>

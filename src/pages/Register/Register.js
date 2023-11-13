@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../../Components/Footer/Footer";
 import Navbar from "../../Components/Navbar/Navbar";
@@ -9,9 +9,13 @@ import Input from "../../Components/Form/Input";
 import Button from "../../Components/Form/Button";
 import { emailValidator, maxValidator, minValidator, requiredValidator } from "../../validators/rules";
 import { useForm } from "../../hooks/useForm";
+import AuthContext from "../../context/authContext";
+
 
 export default function Register() {
- 
+  const BASE_URL="http://127.0.0.1:4000/v1/";
+  const authContext=useContext(AuthContext);
+
   const [formState,onInputHandler]=useForm({
      name:{
       value:'',
@@ -32,9 +36,29 @@ export default function Register() {
   },false);
 
 
+
   const registerNewUser=(e)=>{
     e.preventDefault();
-    console.log(formState);
+    
+    const newUserData={
+      name: formState.inputs.name.value,
+        username:formState.inputs.username.value ,
+        email: formState.inputs.email.value,
+        password:formState.inputs.password.value ,
+        confirmPassword: formState.inputs.password.value
+      }
+    
+   fetch(`${BASE_URL}auth/register`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json'
+    },
+    body:JSON.stringify(newUserData)
+   }).then(res=>res.json())
+   .then(data=>{
+    authContext.login(data.user,data.accessToken);
+    
+   })
   }
 
 

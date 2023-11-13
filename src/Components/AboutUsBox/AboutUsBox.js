@@ -7,7 +7,7 @@ export default function AboutUsBox({ title, desc, icon }) {
     <div className="col-6">
       <div className="about-us__box">
         <div className="about-us__box-right">
-          <i class={`far ${icon} about-us__icon` }></i>
+          <i className={`far ${icon} about-us__icon` }></i>
         </div>
         <div className="about-us__box-left">
           <span className="about-us__box-title">{ title }</span>
