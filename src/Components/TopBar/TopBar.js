@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { memo, useEffect } from "react";
 import "./TopBar.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function TopBar() {
+export default memo(function TopBar() {
   const [allTopbarLink,setAllTopbarLink]=useState([]);
   useEffect(()=>{
       fetch(`http://127.0.0.1:4000/v1/menus/topbar`)
@@ -52,4 +52,4 @@ export default function TopBar() {
       </div>
     </div>
   );
-}
+})
